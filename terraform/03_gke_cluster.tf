@@ -146,13 +146,21 @@ resource "null_resource" "install_istio" {
   depends_on = [null_resource.set_gke_context]
 }
 
+resource "null_resource" "add_env_vars" {
+  provisioner "local-exec" {
+    command = "kubectl set env deployment.apps --all -e PROJECT_ID=${data.google_project.project.project_id}"
+  }
+
+  depends_on = [null_resource.install_istio]
+}
+
 # Deploy microservices into GKE cluster 
 resource "null_resource" "deploy_services" {
   provisioner "local-exec" {
     command = "kubectl apply -f ../kubernetes-manifests"
   }
 
-  depends_on = [null_resource.install_istio]
+  depends_on = [null_resource.add_env_vars]
 }
 
 # We wait for all of our microservices to become available on kubernetes

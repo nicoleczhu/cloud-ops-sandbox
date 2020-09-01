@@ -215,7 +215,9 @@ if __name__ == '__main__':
   # When running on GCP, the exporter handles authentication
   # using automatically default application credentials.
   # When running locally, credentials may need to be set explicitly.
-  cloud_trace_exporter = CloudTraceSpanExporter()
+  cloud_trace_exporter = CloudTraceSpanExporter(
+      project_id=os.environ.get('PROJECT_ID'),
+  )
   trace.get_tracer_provider().add_span_processor(
       SimpleExportSpanProcessor(cloud_trace_exporter)
   )
